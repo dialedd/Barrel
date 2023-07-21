@@ -13,8 +13,7 @@ This was custom-made for a prison server, like a little looting system type thin
 here's a quick video of some features:
 
 
-
-[https://github.com/dialedd/Barrel/assets/95458040/15ac45f2-6171-43d8-9bd6-35d07c86a0c0](https://www.youtube.com/watch?v=9AfsIWoft4k)
+https://www.youtube.com/watch?v=9AfsIWoft4k
 
 
 Here are a couple of things you need to know:
