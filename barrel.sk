@@ -1,0 +1,107 @@
+# made by _dialed
+# functions
+
+function Inv(p: player, k: string):
+	loop items in current inventory of {_p}:
+		set {_s} to index of loop-slot
+		set {_i} to full nbt of loop-slot
+		set tag "Slot" of {_i} to {_s}
+		add {_i} to {_i::*}
+	set {_n} to nbt from "{}"
+	set compound list tag "SavedInv" of {_n} to {_i::*}
+	set {Barrel::%{_k}%} to {_n}
+	message "%{_n}%" to {_p}
+
+function barrel(p: player):
+	set {_t} to random element of {Barrel::*}
+	set {_i::*} to compound list tag "SavedInv" of {_t}
+	set metadata tag "Barrel" of {_p} to chest inventory with 3 rows named "Barrel"
+	loop {_i::*}:
+		set {_s} to tag "Slot" of loop-value
+		set {_i} to nbt item from loop-value
+		set slot {_s} of metadata tag "Barrel" of {_p} to {_i}
+	open (metadata tag "Barrel" of {_p}) to {_p}
+
+function check(p: player, k: string):
+	set metadata tag "Check" of {_p} to chest inventory with 3 rows named "Barrel - %{_k}%"
+	set {_i::*} to compound list tag "SavedInv" of {Barrel::%{_k}%}
+	loop {_i::*}:
+		set {_s} to tag "Slot" of loop-value
+		set {_i} to nbt item from loop-value
+		set slot {_s} of metadata tag "Check" of {_p} to {_i}
+	open (metadata tag "Check" of {_p}) to {_p}
+
+# events
+
+on inventory click:
+	if event-inventory = (metadata tag "Check" of player):
+		cancel event
+
+on inventory close:
+	if {create::%uuid of player%} is set:
+		delete {create::%uuid of player%}
+		Inv(player,{key::%uuid of player%})
+		delete {key::%uuid of player%}
+
+on place:
+	if (nbt compound from tool of player) has tag "Barrel":
+		if player has permission "barrel.place":
+			set {_c} to tag "custom" of nbt of event-block
+			set byte tag "Barrel" of {_c} to 1
+
+on right click on barrel:
+	set {_n} to nbt compound from clicked block
+	set {_c} to tag "custom" of {_n}
+	if {_c} has tag "Barrel":
+		cancel event
+		set {_waited} to difference between {cooldown::%player's uuid%::barrel} and now
+		if {_waited} is less than 10 seconds:
+			send "&cYou are on Barrel Cooldown! try again in %difference between 10 seconds and {_waited}%"
+			stop
+		else:
+			barrel(player)
+			set {cooldown::%player's uuid%::barrel} to now
+
+# commands
+
+command /barrel-create <string>:
+	permission: barrel.set
+	trigger:
+		set {_g} to chest inventory with 3 rows named "Barrel"
+		set (metadata tag "Barrel" of player) to {_g}
+		open (metadata tag "Barrel" of player) to player
+		set {key::%uuid of player%} to arg-1
+		set {create::%uuid of player%} to true 
+
+command /barrel-check <string>:
+	permission: barrel.check
+	trigger:
+		check(player,arg-1)
+
+command /barrel-delete <string>:
+	permission: barrel.delete
+	trigger:
+		delete {Barrel::%arg-1%}
+		message "&bSuccesfully deleted barrel key %arg-1%" to player
+
+command /barrel-list:
+	permission: barrel.list
+	trigger:
+		set {_i::*} to indices of {Barrel::*}
+		message "&bBarrel Keys" to player
+		loop {_i::*}:
+			message "&f%loop-index% - %loop-value%" to player
+
+command /barrel-clear:
+	permission: clear.barrel
+	trigger:
+		delete {Barrel::*}
+		message "&bSuccesfully deleted all barrel keys" to player
+
+command /barrel-give:
+	permission: barrel.give
+	trigger:
+		set {_p} to barrel
+		set name of {_p} to "&fBarrel Lootbox"
+		set byte tag "Barrel" of nbt compound from {_p} to 1
+		give player {_p}
