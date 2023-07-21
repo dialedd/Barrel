@@ -8,6 +8,8 @@ I Made this skript for a friend of mine; basically, it is a loot box system (kin
 Roughly what you do is create custom inventory inside an in-game editing GUI, by dragging and dropping items
 then it saves that inventory, and when a player opens a barrel, it will choose a random gui you created and open it to the player
 
+lil note: u will need some skript experience to set this up, cause u would prolly wanna make the time delay a lot higher
+
 This was custom-made for a prison server, like a little looting system type thing
 
 here's a quick video of some features:
