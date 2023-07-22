@@ -10,7 +10,6 @@ function Inv(p: player, k: string):
 	set {_n} to nbt from "{}"
 	set compound list tag "SavedInv" of {_n} to {_i::*}
 	set {Barrel::%{_k}%} to {_n}
-	message "%{_n}%" to {_p}
 
 function barrel(p: player):
 	set {_t} to random element of {Barrel::*}
